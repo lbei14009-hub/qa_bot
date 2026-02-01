@@ -55,7 +55,6 @@ answers = [
     "握草",
     "喔",
     "幹",
-    "怎麼又是你？",
     "Get out!!!!!"
 
 ]
@@ -170,3 +169,4 @@ async def idle_loop():
         await channel.send(random.choice(lonely_lines))
 
 bot.run(TOKEN)
+
