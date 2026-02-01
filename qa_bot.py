@@ -1,8 +1,9 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import random
 import os
 import asyncio
+import time
 
 TOKEN = os.environ["TOKEN"]
 CHANNEL_ID = int(os.environ["CHANNEL_ID"])
@@ -23,71 +24,86 @@ personas = {
     "毒舌派": [
         "你真的想清楚了嗎",
         "這問題本身就很危險",
-        "你問這個就代表你心裡有數了",
-        "成功的話算你命好"
+        "你心裡其實有答案了"
     ],
     "不正經派": [
         "看心情",
         "問宇宙",
-        "丟硬幣吧",
-        "我剛剛沒在聽"
+        "丟硬幣吧"
     ],
     "擺爛派": [
         "隨便",
         "你高興就好",
-        "嗯",
-        "下一題"
+        "嗯"
     ]
 }
 
 emojis = ["😂", "😈", "🤔", "💀", "🙃", "👀"]
 
-self_roasts = [
-    "等等，我剛剛是不是在亂講",
-    "當我沒說",
-    "我突然不確定了",
-    "算了我不想負責",
-    "剛那句收回"
+follow_questions = [
+    "那你自己怎麼想？",
+    "你是希望是還是不是？",
+    "你其實比較想聽哪個答案？",
+    "如果真的發生了你打算怎麼辦？",
+    "這題你問過自己了嗎？"
 ]
 
-counter_replies = [
-    "不對，我反悔",
-    "其實也不是完全不行",
-    "好啦剛剛太武斷了",
-    "冷靜想想，好像有機會"
+idle_questions = [
+    "所以你們現在是在猶豫什麼？",
+    "有沒有人其實已經有答案了？",
+    "如果現在一定要選，你們會選哪個？",
+    "有人想賭一把嗎？",
+    "這個頻道突然好安靜"
 ]
+
+last_message_time = time.time()
 
 @bot.event
 async def on_ready():
+    idle_asker.start()
     print(f"{bot.user} 已上線")
 
 @bot.event
 async def on_message(message):
+    global last_message_time
+
     if message.author.bot:
         return
 
     if message.channel.id != CHANNEL_ID:
         return
 
+    last_message_time = time.time()
+
     content = message.content.strip()
     if not content.endswith(("?", "？")):
         return
 
     persona = random.choice(list(personas.keys()))
-    first_reply = random.choice(personas[persona])
+    reply = random.choice(personas[persona])
 
     if random.random() < 0.4:
-        first_reply += " " + random.choice(emojis)
+        reply += " " + random.choice(emojis)
 
-    await message.reply(first_reply)
+    await message.reply(reply)
 
-    if random.random() < 0.25:
-        await asyncio.sleep(random.uniform(0.5, 1.5))
-        follow_up = random.choice(self_roasts + counter_replies)
+    if random.random() < 0.2:
+        await asyncio.sleep(random.uniform(0.6, 1.4))
+        question = random.choice(follow_questions)
+        if random.random() < 0.4:
+            question += " " + random.choice(emojis)
+        await message.channel.send(question)
 
-        if random.random() < 0.5:
-            follow_up += " " + random.choice(emojis)
-
-        await message.channel.send(follow_up)
+@tasks.loop(seconds=120)
+async def idle_asker():
+    if time.time() - last_message_time > 600:
+        channel = bot.get_channel(CHANNEL_ID)
+        if channel:
+            question = random.choice(idle_questions)
+            if random.random() < 0.4:
+                question += " " + random.choice(emojis)
+            await channel.send(question)
 
 bot.run(TOKEN)
+
+
