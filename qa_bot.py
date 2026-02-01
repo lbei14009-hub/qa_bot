@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import random
 import os
+import asyncio
 
 TOKEN = os.environ["TOKEN"]
 CHANNEL_ID = int(os.environ["CHANNEL_ID"])
@@ -21,34 +22,40 @@ personas = {
     ],
     "毒舌派": [
         "你真的想清楚了嗎",
-        "問這個代表你已經心裡有答案了",
-        "我不想傷你，但你自己知道結果",
         "這問題本身就很危險",
-        "如果成功了算你運氣好"
+        "你問這個就代表你心裡有數了",
+        "成功的話算你命好"
     ],
     "不正經派": [
         "看心情",
         "問宇宙",
         "丟硬幣吧",
-        "今天不適合做決定",
-        "我剛剛睡著了"
+        "我剛剛沒在聽"
     ],
     "擺爛派": [
         "隨便",
         "你高興就好",
         "嗯",
-        "下一題",
-        "不想回答"
-    ],
-    "路人派": [
-        "我只是路過",
-        "你們繼續，我在看",
-        "這題我不會",
-        "有人懂嗎"
+        "下一題"
     ]
 }
 
-emojis = ["😂", "😈", "🤔", "💀", "🙃", "👀", "🔥"]
+emojis = ["😂", "😈", "🤔", "💀", "🙃", "👀"]
+
+self_roasts = [
+    "等等，我剛剛是不是在亂講",
+    "當我沒說",
+    "我突然不確定了",
+    "算了我不想負責",
+    "剛那句收回"
+]
+
+counter_replies = [
+    "不對，我反悔",
+    "其實也不是完全不行",
+    "好啦剛剛太武斷了",
+    "冷靜想想，好像有機會"
+]
 
 @bot.event
 async def on_ready():
@@ -66,17 +73,21 @@ async def on_message(message):
     if not content.endswith(("?", "？")):
         return
 
-    roll = random.random()
+    persona = random.choice(list(personas.keys()))
+    first_reply = random.choice(personas[persona])
 
-    if roll < 0.1:
-        reply = random.choice(emojis)
-    else:
-        persona = random.choice(list(personas.keys()))
-        reply = random.choice(personas[persona])
+    if random.random() < 0.4:
+        first_reply += " " + random.choice(emojis)
 
-        if random.random() < 0.4:
-            reply += " " + random.choice(emojis)
+    await message.reply(first_reply)
 
-    await message.reply(reply)
+    if random.random() < 0.25:
+        await asyncio.sleep(random.uniform(0.5, 1.5))
+        follow_up = random.choice(self_roasts + counter_replies)
+
+        if random.random() < 0.5:
+            follow_up += " " + random.choice(emojis)
+
+        await message.channel.send(follow_up)
 
 bot.run(TOKEN)
