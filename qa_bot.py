@@ -41,7 +41,7 @@ answers = [
     "啟智",
     ":)?",
     "問之前動一下腦子",
-    "晚餐兒",
+    "DN兒",
     "隨便啦",
     "我懶得想",
     "你開心就好",
@@ -55,11 +55,54 @@ answers = [
     "握草",
     "喔",
     "幹",
-    "Get out!!!!!"
-
+    "Get out!!!!!",
+    "這問題也太普通。",
+    "你真的想靠我決定？",
+    "你沒自己判斷力嗎？",
+    "問點有深度的。",
+    "這都要問？",
+    "你在浪費機會。",
+    "你應該知道答案。",
+    "思考一下吧。",
+    "這問題很危險。",
+    "別太天真。",
+    "現實不會那麼簡單。",
+    "你想逃避決定？",
+    "答案就在你面前。",
+    "不要假裝不知道。",
+    "別讓我重複。",
+    "成熟一點。",
+    "你可以更好。",
+    "這不是小孩問題。",
+    "你在測試我？",
+    "這問題很可疑。",
+    "我拒絕回答。",
+    "你真的想知道？",
+    "不行。",
+    "絕對不。",
+    "現在不適合。",
+    "這條路會失敗。",
+    "別冒這個險。",
+    "風險太高。",
+    "你會後悔。",
+    "結果不理想。",
+    "建議放棄。",
+    "時機錯誤。",
+    "這不是好主意。",
+    "機率極低。",
+    "答案是否定的。",
+    "不要嘗試。",
+    "這會帶來麻煩。",
+    "別再想了。",
+    "這會出問題。",
+    "我不建議。",
+    "算了吧。",
+    "請稍後在問,QA正在陪veeronica",
+    "._.",
+    "老實說,我真的不知道要怎麼回答"
 ]
 
-emojis = ["😂", "😈", "🤔", "💀", "🙃", "👀"]
+emojis = ["🤨", "🥀", "🤔", "💀", "🙃", "👀"]
 
 follow_questions = [
     "那你自己怎麼想？",
@@ -125,14 +168,7 @@ async def on_message(message):
 
     await message.reply(reply)
 
-    if random.random() < 0.25:
-        await asyncio.sleep(random.uniform(0.6, 1.2))
-        q = random.choice(follow_questions)
-        if random.random() < 0.4:
-            q += " " + random.choice(emojis)
-        await message.channel.send(q)
-
-@tasks.loop(seconds=120)
+ @tasks.loop(seconds=120)
 async def idle_loop():
     global last_idle_question_time
 
@@ -169,4 +205,3 @@ async def idle_loop():
         await channel.send(random.choice(lonely_lines))
 
 bot.run(TOKEN)
-
